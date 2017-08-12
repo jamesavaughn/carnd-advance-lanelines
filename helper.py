@@ -7,25 +7,14 @@ import line
 
 def undistort(img, mtx, dist):
     '''
-    This function correct image based on camera calibration.
-    Variables:
-        img: input image
-        mtx: camera matrix
-        dist: distortion coefficients
-    Return:
-        dst: corrected image
+    performs undistortion
     '''
     dst = cv2.undistort(img, mtx, dist, None, mtx)
     return dst
 
 def warp(img):
     '''
-    This funtion performs a perspective transformation to an image.
-    Variable:
-        img: input image
-    Return:
-        warped: perspective transformed image
-        Minv: inverse of perspective transform matrix
+    performs a perspective transformation to an image.
     '''
     img_size = (img.shape[1], img.shape[0])
     # Four source coordinates
@@ -48,13 +37,7 @@ def warp(img):
 
 def color_thred(img):
     '''
-    This function thresholds image based on colorspace channels.
-    Variable:
-        img: input image
-    Return:
-        binary_hls_l: binary threshold per L-channel of HLS
-        binary_lab_b: binary threshold per b-channel of Hab
-        combined_binary: combined binary thresholds
+    thresholds image based on colorspace channels.
     '''
     # Threshold the L-channel of HLS
     hls_l = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)[:,:,1]
@@ -73,11 +56,7 @@ def color_thred(img):
 
 def grad_thred(img):
     '''
-    This function thresholds image based on Sobel gradient on x direction.
-    Variable:
-        img: input image
-    Return:
-        binary_sobelx: binary threshold per Sobel
+    thresholds image based on Sobel gradient on x direction.
     '''
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
@@ -90,12 +69,7 @@ def grad_thred(img):
 
 def combine_threds(img):
     '''
-    This function thresholds image based on combined thresholds
-    of colorspace and gradient.
-    Variable:
-        img: input image
-    Return:
-        combined_binary: combined binary threshold
+    thresholds image based on combined thresholds of colorspace and gradient.
     '''
     _, _, binary_color = color_thred(img)
     binary_grad = grad_thred(img)
@@ -106,14 +80,7 @@ def combine_threds(img):
 
 def locate_lanes(binary_warped):
     '''
-    This function locates the lane lines.
-    Variable:
-        binary_warped: binary warped image
-    Return:
-        leftx: x coordinates of pixels on left lane
-        lefty: y coordinates of pixels on left lane
-        rightx: x coordinates of pixels on right lane
-        righty: y coordinates of pixels on right lane
+    locates the lane lines.
     '''
     # Assuming you have created a warped binary image called "binary_warped"
     # Take a histogram of the bottom half of the image
@@ -193,13 +160,12 @@ def locate_lanes(binary_warped):
 
 def fit_poly(leftx, lefty, rightx, righty):
     '''
-    This function fits the polynomial of lane lines.
-    Variables:
+    fits the polynomial of lane lines.
         leftx: x coordinates of pixels on left lane
         lefty: y coordinates of pixels on left lane
         rightx: x coordinates of pixels on right lane
         righty: y coordinates of pixels on right lane
-    Return:
+
         left_fit: polynomial parameters of left lane
         right_fit: polynomial parameters of right lane
     '''
@@ -210,20 +176,18 @@ def fit_poly(leftx, lefty, rightx, righty):
 
 def locate_lanes_skip_window(binary_warped, left_fit, right_fit):
     '''
-    This function locates the lane lines without sliding windows.
-    Variable:
+    locates the lane lines without sliding windows.
+
         binary_warped: binary warped image
         left_fit: polynomial parameters of left lane
         right_fit: polynomial parameters of right lane
-    Return:
+
         leftx: x coordinates of pixels on left lane
         lefty: y coordinates of pixels on left lane
         rightx: x coordinates of pixels on right lane
         righty: y coordinates of pixels on right lane
     '''
-    # Assume you now have a new warped binary image
-    # from the next frame of video (also called "binary_warped")
-    # It's now much easier to find line pixels!
+
     nonzero = binary_warped.nonzero()
     nonzeroy = np.array(nonzero[0])
     nonzerox = np.array(nonzero[1])
@@ -255,8 +219,8 @@ def locate_lanes_skip_window(binary_warped, left_fit, right_fit):
 def fit_poly_plot(
         binary_warped, left_fit, right_fit, leftx, lefty, rightx, righty):
     '''
-    This function plots the fitted polynomials of lane lines.
-    Variable:
+    plots the fitted polynomials of lane lines.
+
         binary_warped: binary warped image
         left_fit: polynomial parameters of left lane
         right_fit: polynomial parameters of right lane
@@ -264,7 +228,7 @@ def fit_poly_plot(
         lefty: y coordinates of pixels on left lane
         rightx: x coordinates of pixels on right lane
         righty: y coordinates of pixels on right lane
-    Return:
+
         result: result image
         ploty: fitted y coordinates
         left_fitx: fitted x coordinates of left lane
@@ -304,13 +268,13 @@ def fit_poly_plot(
 
 def fit_poly_m(leftx, lefty, rightx, righty):
     '''
-    This function fits the polynomial of lane lines in meters.
-    Variables:
+    fits the polynomial of lane lines in meters.
+
         leftx: x coordinates of pixels on left lane
         lefty: y coordinates of pixels on left lane
         rightx: x coordinates of pixels on right lane
         righty: y coordinates of pixels on right lane
-    Return:
+
         left_fit: polynomial parameters of left lane in meters
         right_fit: polynomial parameters of right lane in meters
     '''
@@ -324,12 +288,12 @@ def fit_poly_m(leftx, lefty, rightx, righty):
 
 def get_curv(binary_warped, left_fit, right_fit):
     '''
-    This function gets the radius of curvature.
-    Variable:
+    gets the radius of curvature.
+
         binary_warped: binary warped image
         left_fit: polynomial parameters of left lane
         right_fit: polynomial parameters of right lane
-    Return:
+
         left_curverad: radius of curvature for left lane
         right_curverad: radius of curvature for right lane
     '''
@@ -342,12 +306,12 @@ def get_curv(binary_warped, left_fit, right_fit):
 
 def get_curv_m(binary_warped, left_fit, right_fit):
     '''
-    This function gets the radius of curvature in meters.
-    Variable:
+    gets the radius of curvature in meters.
+ 
         binary_warped: binary warped image
         left_fit: polynomial parameters of left lane in meters
         right_fit: polynomial parameters of right lane in meters
-    Return:
+ 
         left_curverad: radius of curvature for left lane in meters
         right_curverad: radius of curvature for right lane in meters
     '''
@@ -364,12 +328,12 @@ def get_curv_m(binary_warped, left_fit, right_fit):
 
 def dist2center_m(binary_warped, left_fit, right_fit):
     '''
-    This function gets the distance to road center in meters.
-    Variable:
+    gets the distance to road center in meters.
+ 
         binary_warped: binary warped image
         left_fit: polynomial parameters of left lane
         right_fit: polynomial parameters of right lane
-    Return:
+
         dist: distance to road center in meters
     '''
     y_eval = np.float32(binary_warped.shape[0] - 1)
@@ -384,15 +348,15 @@ def dist2center_m(binary_warped, left_fit, right_fit):
 
 def project_lines(undist, warped, Minv, ploty, left_fitx, right_fitx):
     '''
-    This function projects fitted lane lines onto original image.
-    Variable:
+    projects fitted lane lines onto original image.
+ 
         undist: original image
         warped: warped image
         Minv: inverse of perspective transform matrix
         ploty: fitted y coordinates
         left_fitx: fitted x coordinates of left lane
         right_fitx: fitted x coordinates of right lane
-    Return:
+
         result: result image
     '''
     # Create an image to draw the lines on
@@ -416,16 +380,15 @@ def project_lines(undist, warped, Minv, ploty, left_fitx, right_fitx):
 
 def validate_lane(left_curv, right_curv, left2c, right2c, left_fit, right_fit):
     '''
-    This function validate the lane lines through checking curvature,
-    horizontal distance, and parallel.
-    Variable:
+    validate the lane lines through checking curvature, horizontal distance, and parallel.
+
         left_curve: radius of curvature of left lane
         right_curve: radius of curvature of right lane
         left2c: left lane to center distance
         right2c: right lane to center distance
         left_fit: quadratic polynomial parameters of left lane
         right_fit: quadratic polynomial parameters of right lane
-    Return:
+ 
         flag: True: lane lines are valid; False: lane lines are invalid.
     '''
     # check curvature
@@ -450,14 +413,14 @@ def validate_lane(left_curv, right_curv, left2c, right2c, left_fit, right_fit):
 
 def process_image(img, mtx, dist, left, right):
     '''
-    This function defines the image process pipeline.
-    Variable:
+    defines the image process pipeline.
+    
         img: input image
         mtx: camera matrix
         dist: distortion coefficients
         left: left lane instance
         right: right lane instance
-    Return:
+    
         result: output image
     '''
     img0 = undistort(img, mtx, dist)
