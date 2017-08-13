@@ -2,7 +2,6 @@
 ## Advanced Lane Finding Project
 
 The goals / steps of this project are the following:
-
 * Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
 * Apply a distortion correction to raw images.
 * Use color transforms, gradients, etc., to create a thresholded binary image.
@@ -11,6 +10,78 @@ The goals / steps of this project are the following:
 * Determine the curvature of the lane and vehicle position with respect to center.
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
+
+## Submission notes
+
+## Rubric #1: Camera Calibration
+1) Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+* step 1 - I identified object and image points in the calibration chessboard images.
+* step 2 - Read in the images using cv2.imread.
+* step 3 - Then used cv2.drawChessboardCorners to draw corners.
+* step 4 - Saved corner files and camera calibration data.
+* step 5 - Used the camera calibration data to undistort the images using cv2.undistort.
+* step 6 - Image can be seen as undistorted_chessboard.jpg.
+
+## Rubric #2: Pipeline(test images)
+2) Provide an example of a distortion-corrected image.
+* Distortion-corrected test image can be seen in './test_images/corrected_test1.jpg'
+
+3) Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image. Provide an example of a binary image result.
+* Code is located in 'helper.py' - line 49-105
+    * For color transforms...
+    * I thresholded the L-channel of HLS using 201 and 255 as boundaries
+    * I thresholded the B-channel of LAB using 145 and 255 as boundaries
+    * I combined both color binary spaces
+* For gradients...
+    * I converted the images to grayscale
+    * Calculated the Sobel X gradient using cv2.Sobel and kernal size 5
+* Lastly, I combined both the color and grdient thresholds
+
+
+4) Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+* Code is located in 'helper.py' - line 42-46
+    * I calculated the perspective transform on the source and destination points and warped the image
+
+
+5) Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+* Code is located in 'helper.py' - line 107-206
+* For lane-line pixel identification...
+    * I utilized convolution techniques
+    * I located the lane lines by taking a histogram of the lower part of the binary warped images
+    * I found the peak of the left and right halves of the histogram; the starting point for the left and right lines
+    * I chose the number of sliding windows and set the height
+    * Then I identified the non-zero pixles within the sliding windows
+    * I created a list of nonzero pixles and extracted left and right positions
+* For polynomial fit...
+    * I defined conversions in x and y from pixels space to meters
+    * Then I fit new polynomials to x,y in world space
+    
+6) Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+* Code is located in 'helper.py' - line 322-380
+* For radius of curvature...
+    * I used the warped image and the polynomial perameters to calculate the radius
+    * I checked the lines by checking their respective curvature and slopes
+
+7) Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+* Sample image can be found in 'test_images' folder or down below
+
+## Rubric #3: Pipeline(video)
+8) Provide a link to your final video output. Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!)
+* Videos can be found in files...
+    * test.mp4, test_harder.mp4, test_challenge.mp4
+
+## Rubric #4: Discussion
+9) Briefly discuss any problems / issues you faced in your implementation of this project. Where will your pipeline likely fail? What could you do to make it more robust?
+* I faced problems in creating my binary images. Images would be all black or noisy.  Color spaces also posed a challenge because it was difficult to guage the ralational aspects of the thresholds.  I had to use a color selector to find the right values.  
+* I faced problems in identifying the lane lines and drawing the polynomials. At first the lines were identified, but the sliding window wasn't positioned correctly. I had to seek help from the forum and slack channels.
+* Pipeline will likely fail when driving through a tunnel or very low light scenarios, additional thresholding techniques could help or using other sensor inputs.
+
+
+
+
+
+
+
 
 ---
 ## 1. Use chessboard to calibrate the camera
